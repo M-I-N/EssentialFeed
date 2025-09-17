@@ -117,7 +117,7 @@ private class ManagedCache: NSManagedObject {
     }
     
     static func find(in context: NSManagedObjectContext) throws -> ManagedCache? {
-        let request = NSFetchRequest<ManagedCache>(entityName: ManagedCache.entity().name!)
+        let request = ManagedCache.fetchRequest() as! NSFetchRequest<ManagedCache>
         request.returnsObjectsAsFaults = false
         return try context.fetch(request).first
     }
