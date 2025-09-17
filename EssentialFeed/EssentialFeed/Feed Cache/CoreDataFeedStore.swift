@@ -37,7 +37,7 @@ public class CoreDataFeedStore: FeedStore {
                 managed.url = $0.url
                 return managed
             }
-            managedCache.feed = NSSet(array: managedFeed)
+            managedCache.feed = NSOrderedSet(array: managedFeed)
             do {
                 try context.save()
                 completion(nil)
@@ -130,7 +130,7 @@ private extension NSManagedObjectModel {
 @objc(ManagedCache)
 private class ManagedCache: NSManagedObject {
     @NSManaged var timestamp: Date
-    @NSManaged var feed: NSSet
+    @NSManaged var feed: NSOrderedSet
 }
 
 @objc(ManagedFeedImage)
