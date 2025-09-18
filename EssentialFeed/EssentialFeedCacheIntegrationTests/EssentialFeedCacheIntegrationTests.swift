@@ -22,15 +22,15 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
         undoStoreSideEffects()
     }
     
-    func test_load_deliversNoItemsOnEmptyCache() {
-        let sut = makeSUT()
+    func test_load_deliversNoItemsOnEmptyCache() throws {
+        let sut = try makeSUT()
         
         expect(sut, toLoad: [])
     }
     
-    func test_load_deliversItemsSavedOnASeparateInstance() {
-        let sutToPerformSave = makeSUT()
-        let sutToPerformLoad = makeSUT()
+    func test_load_deliversItemsSavedOnASeparateInstance() throws {
+        let sutToPerformSave = try makeSUT()
+        let sutToPerformLoad = try makeSUT()
         let feed = uniqueImageFeed().models
         
         save(feed, with: sutToPerformSave)
@@ -38,10 +38,10 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
         expect(sutToPerformLoad, toLoad: feed)
     }
     
-    func test_load_overridesItemsSavedOnASeparateInstance() {
-        let sutToPerformInitialSave = makeSUT()
-        let sutToPerformLatestSave = makeSUT()
-        let sutToPerformLoad = makeSUT()
+    func test_load_overridesItemsSavedOnASeparateInstance() throws {
+        let sutToPerformInitialSave = try makeSUT()
+        let sutToPerformLatestSave = try makeSUT()
+        let sutToPerformLoad = try makeSUT()
         let firstFeed = uniqueImageFeed().models
         let latestFeed = uniqueImageFeed().models
         
@@ -56,9 +56,9 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
     private func makeSUT(
         file: StaticString = #filePath,
         line: UInt = #line
-    ) -> LocalFeedLoader {
+    ) throws -> LocalFeedLoader {
         let bundle = Bundle(for: CoreDataFeedStore.self)
-        let store = try! CoreDataFeedStore(storeURL: testSpecificStoreURL(), bundle: bundle)
+        let store = try CoreDataFeedStore(storeURL: testSpecificStoreURL(), bundle: bundle)
         let sut = LocalFeedLoader(store: store, currentDate: Date.init)
         trackForMemoryLeaks(store, file: file, line: line)
         trackForMemoryLeaks(sut, file: file, line: line)
