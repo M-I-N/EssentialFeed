@@ -8,14 +8,24 @@
 import CoreData
 
 public class CoreDataFeedStore: FeedStore {
+    private static let modelName = "FeedStore"
+    private static let model = NSManagedObjectModel(name: modelName, in: Bundle(for: CoreDataFeedStore.self))
+    
     private let container: NSPersistentContainer
     private let context: NSManagedObjectContext
     
-    public init (storeURL: URL, bundle: Bundle = .main) throws {
+    enum ModelNotFound: Error {
+        case modelName
+    }
+    
+    public init (storeURL: URL) throws {
+        guard let model = Self.model else {
+            throw ModelNotFound.modelName
+        }
         container = try NSPersistentContainer.load(
-            modelName: "FeedStore",
-            url: storeURL,
-            in: bundle
+            name: Self.modelName,
+            model: model,
+            url: storeURL
         )
         context = container.newBackgroundContext()
     }
