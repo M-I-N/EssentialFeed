@@ -72,8 +72,8 @@ final class EssentialFeedCacheIntegrationTests: XCTestCase {
     ) {
         let saveExp = expectation(description: "Wait for save completion")
         loader.save(feed) { result in
-            if case .failure = result {
-                XCTFail("Expected to save feed successfully", file: file, line: line)
+            if case .failure(let error) = result {
+                XCTFail("Expected to save image feed successfully, got \(error) instead", file: file, line: line)
             }
             saveExp.fulfill()
         }
