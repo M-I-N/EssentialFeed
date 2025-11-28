@@ -33,11 +33,29 @@ class EssentialFeedEndToEndTests: XCTestCase {
     
     // MARK: Helpers
     
+    private class UnsafeURLSessionDelegate: NSObject, URLSessionDelegate {
+        func urlSession(
+            _ session: URLSession,
+            didReceive challenge: URLAuthenticationChallenge,
+            completionHandler: @escaping (URLSession.AuthChallengeDisposition, URLCredential?) -> Void
+        ) {
+            if challenge.protectionSpace.authenticationMethod == NSURLAuthenticationMethodServerTrust,
+               let trust = challenge.protectionSpace.serverTrust {
+                completionHandler(.useCredential, URLCredential(trust: trust))
+            } else {
+                completionHandler(.performDefaultHandling, nil)
+            }
+        }
+    }
+    
     private func getFeedResult(
         file: StaticString = #filePath,
         line: UInt = #line
     ) -> FeedLoader.Result? {
-        let client = URLSessionHTTPClient(session: URLSession(configuration: .ephemeral))
+        let delegate = UnsafeURLSessionDelegate()
+        let configuration = URLSessionConfiguration.ephemeral
+        let session = URLSession(configuration: configuration, delegate: delegate, delegateQueue: nil)
+        let client = URLSessionHTTPClient(session: session)
         let testServerURL = URL(string: "https://essentialdeveloper.com/feed-case-study/test-api/feed")!
         let loader = RemoteFeedLoader(client: client, url: testServerURL)
         trackForMemoryLeaks(client, file: file, line: line)
